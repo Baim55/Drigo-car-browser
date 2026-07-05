@@ -10,6 +10,7 @@ import SortSelect from "./components/SortSelect";
 import ResultsCounter from "./components/ResultsCounter";
 import EmptyState from "./components/EmptyState";
 import { useSearchParams } from "react-router-dom";
+import Header from "./components/Header";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,23 +66,31 @@ function App() {
   }, [search, transmission, type, availableOnly, sort, setSearchParams]);
 
   return (
-    <div className="container">
-      <SearchBar value={search} onChange={setSearch} />
-      <FilterBar
-        transmission={transmission}
-        onTransmissionChange={setTransmission}
-        type={type}
-        onTypeChange={setType}
-        availableOnly={availableOnly}
-        onAvailableOnlyChange={setAvailableOnly}
-      />
-      <SortSelect sort={sort} onSortChange={setSort} />
-      <ResultsCounter shown={filteredCars.length} total={cars.length} />
-      {filteredCars.length === 0 ? (
-        <EmptyState onReset={handleReset} />
-      ) : (
-        <CarGrid cars={filteredCars} />
-      )}
+    <div className="mb-5">
+      <Header />
+      <div className="container grid grid-cols-1 md:grid-cols-[280px_1fr] gap-5">
+        <div className="shadow-xl p-5 ">
+          <SearchBar value={search} onChange={setSearch} />
+          <FilterBar
+            transmission={transmission}
+            onTransmissionChange={setTransmission}
+            type={type}
+            onTypeChange={setType}
+            availableOnly={availableOnly}
+            onAvailableOnlyChange={setAvailableOnly}
+          />
+          <SortSelect sort={sort} onSortChange={setSort} />
+        </div>
+        <div className=" px-3 md:px-0">
+          {" "}
+          <ResultsCounter shown={filteredCars.length} total={cars.length} />
+          {filteredCars.length === 0 ? (
+            <EmptyState onReset={handleReset} />
+          ) : (
+            <CarGrid cars={filteredCars} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

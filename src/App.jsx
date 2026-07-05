@@ -7,6 +7,8 @@ import filterCars from "./utils/filterCars";
 import FilterBar from "./components/FilterBar";
 import sortCars from "./utils/sortCars";
 import SortSelect from "./components/SortSelect";
+import ResultsCounter from "./components/ResultsCounter";
+import EmptyState from "./components/EmptyState";
 
 function App() {
   const [search, setSearch] = useState("");
@@ -27,6 +29,14 @@ function App() {
     return sortCars(filtered, sort);
   }, [debouncedSearch, transmission, type, availableOnly, sort]);
 
+  function handleReset() {
+    setSearch("");
+    setTransmission("All");
+    setType("All");
+    setAvailableOnly(false);
+    setSort("none");
+  }
+
   return (
     <div className="container">
       <SearchBar value={search} onChange={setSearch} />
@@ -39,7 +49,12 @@ function App() {
         onAvailableOnlyChange={setAvailableOnly}
       />
       <SortSelect sort={sort} onSortChange={setSort} />
-      <CarGrid cars={filteredCars} />
+      <ResultsCounter shown={filteredCars.length} total={cars.length} />
+      {filteredCars.length === 0 ? (
+        <EmptyState onReset={handleReset} />
+      ) : (
+        <CarGrid cars={filteredCars} />
+      )}
     </div>
   );
 }

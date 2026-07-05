@@ -5,7 +5,7 @@ function SearchBar({ value, onChange }) {
       placeholder="Search by car name..."
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="border rounded-2xl px-3 py-2 w-full"
+      className="border rounded-2xl px-3 py-2 w-full my-5"
     />
   );
 }

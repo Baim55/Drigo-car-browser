@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CarGrid from "./components/CarGrid";
 import SearchBar from "./components/SearchBar";
 import cars from "./data/cars.json";
@@ -9,13 +9,20 @@ import sortCars from "./utils/sortCars";
 import SortSelect from "./components/SortSelect";
 import ResultsCounter from "./components/ResultsCounter";
 import EmptyState from "./components/EmptyState";
+import { useSearchParams } from "react-router-dom";
 
 function App() {
-  const [search, setSearch] = useState("");
-  const [transmission, setTransmission] = useState("All");
-  const [type, setType] = useState("All");
-  const [availableOnly, setAvailableOnly] = useState(false);
-  const [sort, setSort] = useState("none");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [search, setSearch] = useState(() => searchParams.get("q") || "");
+  const [transmission, setTransmission] = useState(
+    () => searchParams.get("transmission") || "All",
+  );
+  const [type, setType] = useState(() => searchParams.get("type") || "All");
+  const [availableOnly, setAvailableOnly] = useState(
+    () => searchParams.get("available") === "1",
+  );
+  const [sort, setSort] = useState(() => searchParams.get("sort") || "none");
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -36,6 +43,26 @@ function App() {
     setAvailableOnly(false);
     setSort("none");
   }
+
+  useEffect(() => {
+    const params = {};
+    if (search) {
+      params.q = search;
+    }
+    if (transmission !== "All") {
+      params.transmission = transmission;
+    }
+    if (type !== "All") {
+      params.type = type;
+    }
+    if (availableOnly) {
+      params.available = "1";
+    }
+    if (sort !== "none") {
+      params.sort = sort;
+    }
+    setSearchParams(params, { replace: true });
+  }, [search, transmission, type, availableOnly, sort, setSearchParams]);
 
   return (
     <div className="container">

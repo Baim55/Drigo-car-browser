@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import CarGrid from "./components/CarGrid";
 import SearchBar from "./components/SearchBar";
-import cars from "./data/cars.json";
 import useDebounce from "./hooks/useDebounce";
 import filterCars from "./utils/filterCars";
 import FilterBar from "./components/FilterBar";
@@ -11,8 +10,12 @@ import ResultsCounter from "./components/ResultsCounter";
 import EmptyState from "./components/EmptyState";
 import { useSearchParams } from "react-router-dom";
 import Header from "./components/Header";
+import LoadingState from "./components/LoadingState";
+import ErrorState from "./components/ErrorState";
+import useCars from "./hooks/useCars";
 
 function App() {
+  const { data: cars, loading, error, retry } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [search, setSearch] = useState(() => searchParams.get("q") || "");
@@ -28,6 +31,7 @@ function App() {
   const debouncedSearch = useDebounce(search, 300);
 
   const filteredCars = useMemo(() => {
+    if (!cars) return [];
     const filtered = filterCars(cars, {
       search: debouncedSearch,
       transmission,
@@ -35,7 +39,7 @@ function App() {
       availableOnly,
     });
     return sortCars(filtered, sort);
-  }, [debouncedSearch, transmission, type, availableOnly, sort]);
+  }, [cars, debouncedSearch, transmission, type, availableOnly, sort]);
 
   function handleReset() {
     setSearch("");
@@ -64,6 +68,9 @@ function App() {
     }
     setSearchParams(params, { replace: true });
   }, [search, transmission, type, availableOnly, sort, setSearchParams]);
+
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState message={error} onRetry={retry} />;
 
   return (
     <div className="mb-5">

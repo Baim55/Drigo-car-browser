@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import CarGrid from "./components/CarGrid";
 import SearchBar from "./components/SearchBar";
 import useDebounce from "./hooks/useDebounce";
@@ -13,61 +13,68 @@ import Header from "./components/Header";
 import LoadingState from "./components/LoadingState";
 import ErrorState from "./components/ErrorState";
 import useCars from "./hooks/useCars";
+import filtersReducer, { initialFilters } from "./reducers/filtersReducer";
 
 function App() {
   const { data: cars, loading, error, retry } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [search, setSearch] = useState(() => searchParams.get("q") || "");
-  const [transmission, setTransmission] = useState(
-    () => searchParams.get("transmission") || "All",
+  const [filters, dispatch] = useReducer(
+    filtersReducer,
+    initialFilters,
+    (init) => ({
+      ...init,
+      search: searchParams.get("q") || init.search,
+      transmission: searchParams.get("transmission") || init.transmission,
+      type: searchParams.get("type") || init.type,
+      availableOnly: searchParams.get("available") === "1",
+      sort: searchParams.get("sort") || init.sort,
+    }),
   );
-  const [type, setType] = useState(() => searchParams.get("type") || "All");
-  const [availableOnly, setAvailableOnly] = useState(
-    () => searchParams.get("available") === "1",
-  );
-  const [sort, setSort] = useState(() => searchParams.get("sort") || "none");
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(filters.search, 300);
 
   const filteredCars = useMemo(() => {
     if (!cars) return [];
     const filtered = filterCars(cars, {
       search: debouncedSearch,
-      transmission,
-      type,
-      availableOnly,
+      transmission: filters.transmission,
+      type: filters.type,
+      availableOnly: filters.availableOnly,
     });
-    return sortCars(filtered, sort);
-  }, [cars, debouncedSearch, transmission, type, availableOnly, sort]);
+    return sortCars(filtered, filters.sort);
+  }, [
+    cars,
+    debouncedSearch,
+    filters.transmission,
+    filters.type,
+    filters.availableOnly,
+    filters.sort,
+  ]);
 
   function handleReset() {
-    setSearch("");
-    setTransmission("All");
-    setType("All");
-    setAvailableOnly(false);
-    setSort("none");
+    dispatch({ type: "RESET" });
   }
 
   useEffect(() => {
     const params = {};
-    if (search) {
-      params.q = search;
+    if (filters.search) {
+      params.q = filters.search;
     }
-    if (transmission !== "All") {
-      params.transmission = transmission;
+    if (filters.transmission !== "All") {
+      params.transmission = filters.transmission;
     }
-    if (type !== "All") {
-      params.type = type;
+    if (filters.type !== "All") {
+      params.type = filters.type;
     }
-    if (availableOnly) {
+    if (filters.availableOnly) {
       params.available = "1";
     }
-    if (sort !== "none") {
-      params.sort = sort;
+    if (filters.sort !== "none") {
+      params.sort = filters.sort;
     }
     setSearchParams(params, { replace: true });
-  }, [search, transmission, type, availableOnly, sort, setSearchParams]);
+  }, [filters, setSearchParams]);
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
@@ -77,16 +84,32 @@ function App() {
       <Header />
       <div className="container grid grid-cols-1 md:grid-cols-[280px_1fr] gap-5">
         <div className="shadow-xl p-5 ">
-          <SearchBar value={search} onChange={setSearch} />
-          <FilterBar
-            transmission={transmission}
-            onTransmissionChange={setTransmission}
-            type={type}
-            onTypeChange={setType}
-            availableOnly={availableOnly}
-            onAvailableOnlyChange={setAvailableOnly}
+          <SearchBar
+            value={filters.search}
+            onChange={(value) =>
+              dispatch({ type: "SET_SEARCH", payload: value })
+            }
           />
-          <SortSelect sort={sort} onSortChange={setSort} />
+          <FilterBar
+            transmission={filters.transmission}
+            onTransmissionChange={(value) =>
+              dispatch({ type: "SET_TRANSMISSION", payload: value })
+            }
+            type={filters.type}
+            onTypeChange={(value) =>
+              dispatch({ type: "SET_TYPE", payload: value })
+            }
+            availableOnly={filters.availableOnly}
+            onAvailableOnlyChange={(value) =>
+              dispatch({ type: "SET_AVAILABLE_ONLY", payload: value })
+            }
+          />
+          <SortSelect
+            sort={filters.sort}
+            onSortChange={(value) =>
+              dispatch({ type: "SET_SORT", payload: value })
+            }
+          />
         </div>
         <div className=" px-3 md:px-0">
           {" "}

@@ -39,7 +39,7 @@ function App() {
       priceMax: searchParams.get("priceMax") || init.priceMax,
       seats: searchParams.get("seats") || init.seats,
       sort: searchParams.get("sort") || init.sort,
-      page: Number(searchParams.get("page") || init.page),
+      page: Number(searchParams.get("page")) || init.page,
     }),
   );
 

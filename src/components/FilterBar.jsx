@@ -41,7 +41,6 @@ function FilterBar({
       </div>
       <div className="w-full">
         <p className="font-bold text-[20px]">Seats</p>
-
         <select
           value={seats}
           onChange={(e) => onSeatsChange(e.target.value)}

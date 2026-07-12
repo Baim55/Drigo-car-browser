@@ -25,6 +25,29 @@ function SortSelect({ sort, onSortChange }) {
           High → Low
         </button>
       </div>
+      <div className="flex gap-2 mt-2">
+        <button
+          onClick={() => onSortChange("name-az")}
+          className={`flex-1 rounded-lg py-2 font-medium border transition ${
+            sort === "name-az"
+              ? "bg-blue-900 text-white border-blue-900"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+          }`}
+        >
+          Name: A → Z
+        </button>
+
+        <button
+          onClick={() => onSortChange("name-za")}
+          className={`flex-1 rounded-lg py-2 font-medium border transition ${
+            sort === "name-za"
+              ? "bg-blue-900 text-white border-blue-900"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+          }`}
+        >
+          Name: Z → A
+        </button>
+      </div>
     </div>
   );
 }

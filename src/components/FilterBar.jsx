@@ -1,11 +1,16 @@
 function FilterBar({
   transmission,
   onTransmissionChange,
-  type,
-  onTypeChange,
+  types,
+  onTypeToggle,
   availableOnly,
   onAvailableOnlyChange,
+  seats,
+  onSeatsChange,
 }) {
+
+  const ALL_TYPES = ["Economy", "Sedan", "SUV", "Luxury"];
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="w-full">
@@ -23,16 +28,28 @@ function FilterBar({
 
       <div className="w-full">
         <p className="font-bold text-[20px]">Type</p>
+       {ALL_TYPES.map((t)=>(
+        <label key={t} className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={types.includes(t)}
+            onChange={() => onTypeToggle(t)}
+          />
+          {t}
+        </label>
+       ))}
+      </div>
+      <div className="w-full">
+        <p className="font-bold text-[20px]">Seats</p>
+
         <select
-          value={type}
-          onChange={(e) => onTypeChange(e.target.value)}
+          value={seats}
+          onChange={(e) => onSeatsChange(e.target.value)}
           className="w-full border border-gray-400 rounded-[10px] px-3 py-2 mt-2"
         >
-          <option value="All">All Types</option>
-          <option value="Economy">Economy</option>
-          <option value="Sedan">Sedan</option>
-          <option value="SUV">SUV</option>
-          <option value="Luxury">Luxury</option>
+          <option value="All">All Seats</option>
+          <option value="5">5 seats</option>
+          <option value="7">7 seats</option>
         </select>
       </div>
 

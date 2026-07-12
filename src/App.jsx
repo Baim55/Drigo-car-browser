@@ -14,6 +14,7 @@ import LoadingState from "./components/LoadingState";
 import ErrorState from "./components/ErrorState";
 import useCars from "./hooks/useCars";
 import filtersReducer, { initialFilters } from "./reducers/filtersReducer";
+import PriceRangeFilter from "./components/PriceRangeFilter";
 
 function App() {
   const { data: cars, loading, error, retry } = useCars();
@@ -26,29 +27,42 @@ function App() {
       ...init,
       search: searchParams.get("q") || init.search,
       transmission: searchParams.get("transmission") || init.transmission,
-      type: searchParams.get("type") || init.type,
+      types: searchParams.get("types")
+        ? searchParams.get("types").split(",")
+        : init.types,
       availableOnly: searchParams.get("available") === "1",
+      priceMin: searchParams.get("priceMin") || init.priceMin,
+      priceMax: searchParams.get("priceMax") || init.priceMax,
+      seats: searchParams.get("seats") || init.seats,
       sort: searchParams.get("sort") || init.sort,
     }),
   );
 
   const debouncedSearch = useDebounce(filters.search, 300);
+  const debouncedPriceMin = useDebounce(filters.priceMin, 300);
+  const debouncedPriceMax = useDebounce(filters.priceMax, 300);
 
   const filteredCars = useMemo(() => {
     if (!cars) return [];
     const filtered = filterCars(cars, {
       search: debouncedSearch,
       transmission: filters.transmission,
-      type: filters.type,
+      types: filters.types,
       availableOnly: filters.availableOnly,
+      priceMin: debouncedPriceMin,
+      priceMax: debouncedPriceMax,
+      seats: filters.seats,
     });
     return sortCars(filtered, filters.sort);
   }, [
     cars,
     debouncedSearch,
     filters.transmission,
-    filters.type,
+    filters.types,
     filters.availableOnly,
+    debouncedPriceMin,
+    debouncedPriceMax,
+    filters.seats,
     filters.sort,
   ]);
 
@@ -64,12 +78,15 @@ function App() {
     if (filters.transmission !== "All") {
       params.transmission = filters.transmission;
     }
-    if (filters.type !== "All") {
-      params.type = filters.type;
+    if (filters.types.length > 0) {
+      params.types = filters.types.join(",");
     }
     if (filters.availableOnly) {
       params.available = "1";
     }
+    if (filters.priceMin !== "") params.priceMin = filters.priceMin;
+    if (filters.priceMax !== "") params.priceMax = filters.priceMax;
+    if (filters.seats !== "All") params.seats = filters.seats;
     if (filters.sort !== "none") {
       params.sort = filters.sort;
     }
@@ -95,14 +112,24 @@ function App() {
             onTransmissionChange={(value) =>
               dispatch({ type: "SET_TRANSMISSION", payload: value })
             }
-            type={filters.type}
-            onTypeChange={(value) =>
-              dispatch({ type: "SET_TYPE", payload: value })
+            types={filters.types}
+            onTypeToggle={(type) =>
+              dispatch({ type: "TOGGLE_TYPE", payload: type })
             }
             availableOnly={filters.availableOnly}
             onAvailableOnlyChange={(value) =>
               dispatch({ type: "SET_AVAILABLE_ONLY", payload: value })
             }
+            seats={filters.seats}
+            onSeatsChange={(value) =>
+              dispatch({ type: "SET_SEATS", payload: value })
+            }
+          />
+          <PriceRangeFilter
+            priceMin={filters.priceMin}
+            priceMax={filters.priceMax}
+            onPriceMinChange={(value) => dispatch({ type: "SET_PRICE_MIN", payload: value })}
+            onPriceMaxChange={(value) => dispatch({ type: "SET_PRICE_MAX", payload: value })}
           />
           <SortSelect
             sort={filters.sort}

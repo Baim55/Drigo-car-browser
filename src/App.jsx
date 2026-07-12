@@ -15,8 +15,12 @@ import ErrorState from "./components/ErrorState";
 import useCars from "./hooks/useCars";
 import filtersReducer, { initialFilters } from "./reducers/filtersReducer";
 import PriceRangeFilter from "./components/PriceRangeFilter";
+import paginate from "./utils/paginate";
+import Pagination from "./components/Pagination";
 
 function App() {
+  const PAGE_SIZE = 6;
+
   const { data: cars, loading, error, retry } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -35,6 +39,7 @@ function App() {
       priceMax: searchParams.get("priceMax") || init.priceMax,
       seats: searchParams.get("seats") || init.seats,
       sort: searchParams.get("sort") || init.sort,
+      page: Number(searchParams.get("page") || init.page),
     }),
   );
 
@@ -66,6 +71,10 @@ function App() {
     filters.sort,
   ]);
 
+  const { paginatedItems, totalPages, currentPage } = useMemo(() => {
+    return paginate(filteredCars, filters.page, PAGE_SIZE);
+  }, [filteredCars, filters.page]);
+
   function handleReset() {
     dispatch({ type: "RESET" });
   }
@@ -83,6 +92,9 @@ function App() {
     }
     if (filters.availableOnly) {
       params.available = "1";
+    }
+    if (filters.page > 1) {
+      params.page = filters.page;
     }
     if (filters.priceMin !== "") params.priceMin = filters.priceMin;
     if (filters.priceMax !== "") params.priceMax = filters.priceMax;
@@ -128,8 +140,12 @@ function App() {
           <PriceRangeFilter
             priceMin={filters.priceMin}
             priceMax={filters.priceMax}
-            onPriceMinChange={(value) => dispatch({ type: "SET_PRICE_MIN", payload: value })}
-            onPriceMaxChange={(value) => dispatch({ type: "SET_PRICE_MAX", payload: value })}
+            onPriceMinChange={(value) =>
+              dispatch({ type: "SET_PRICE_MIN", payload: value })
+            }
+            onPriceMaxChange={(value) =>
+              dispatch({ type: "SET_PRICE_MAX", payload: value })
+            }
           />
           <SortSelect
             sort={filters.sort}
@@ -144,8 +160,15 @@ function App() {
           {filteredCars.length === 0 ? (
             <EmptyState onReset={handleReset} />
           ) : (
-            <CarGrid cars={filteredCars} />
+            <CarGrid cars={paginatedItems} />
           )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) =>
+              dispatch({ type: "SET_PAGE", payload: page })
+            }
+          />
         </div>
       </div>
     </div>

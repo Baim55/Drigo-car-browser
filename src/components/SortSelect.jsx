@@ -1,7 +1,7 @@
 function SortSelect({ sort, onSortChange }) {
   return (
     <div className="w-full mt-3">
-      <p className="font-bold text-[20px] mb-2">Sort by Price</p>
+      <p className="font-bold text-[20px] mb-2">Sort by</p>
       <div className="flex gap-2">
         <button
           onClick={() => onSortChange("low-high")}

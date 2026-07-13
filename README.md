@@ -1,24 +1,33 @@
-# Drigo Car Browser
+# Drigo Car Browser Pro
 
-Week 1 internship task — searchable & filterable car listing built with React + Vite.
+Week 2 internship task — async data, detail routes, richer filters, pagination, and persisted favorites.
 
 ## Features
-- Search by car name (self-implemented debounce, 300ms)
-- Filter by transmission, type, and availability (AND logic — filters narrow results)
-- Sort by price (low to high / high to low)
-- Live results counter
-- Empty state with reset
-- URL sync — filters, search, and sort persist across page reload
+- Async data layer with simulated loading/error states (fake API, ~20% failure rate)
+- Search (debounced), transmission, multi-select type, price range (debounced), seats, and availability filters — all combine with AND logic
+- Sort by price (low/high) and name (A-Z/Z-A)
+- Pagination (6 per page)
+- Detail page per car (`/cars/:id`), deep-linkable, with a clean "not found" for bad ids
+- Back from detail restores the exact filtered/sorted/paged view
+- Favorites, persisted in localStorage, synced between list and detail
+- URL is the single source of truth for search, filters, sort, and page
 
 ## Setup
 
-```bash
+\`\`\`bash
 npm install
 npm run dev
-```
+\`\`\`
+
+## Running tests
+
+\`\`\`bash
+npm test
+\`\`\`
 
 ## Stack
 - React (Vite)
+- React Router
 - Tailwind CSS
-- React Router (for URL query params)
 - react-icons
+- Vitest + Testing Library

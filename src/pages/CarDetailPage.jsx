@@ -2,18 +2,31 @@ import { useParams, useNavigate } from "react-router-dom";
 import useCars from "../hooks/useCars";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
-import { FaCar, FaRegUser, FaArrowLeft } from "react-icons/fa";
+import {
+  FaCar,
+  FaRegUser,
+  FaArrowLeft,
+  FaHeart,
+  FaRegHeart,
+} from "react-icons/fa";
 import { TbAutomaticGearbox, TbManualGearbox } from "react-icons/tb";
+import useFavorites from "../hooks/useFavorites";
 
 function CarDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: cars, loading, error, retry } = useCars();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
 
   const car = cars.find((car) => car.id === Number(id));
+
+  function handleFavoriteClick(e) {
+    e.preventDefault();
+    toggleFavorite(car.id);
+  }
 
   if (!car) {
     return (
@@ -51,12 +64,16 @@ function CarDetailPage() {
 
       <div className="bg-white border border-gray-200 rounded-2xl shadow-xl max-w-4xl overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Left: image */}
-          <div className="w-full h-64 md:h-full bg-gray-100 flex items-center justify-center text-7xl">
+          <div className="w-full h-64 md:h-full bg-gray-100 flex items-center justify-center text-7xl relative">
             <FaCar />
+            <button
+              onClick={handleFavoriteClick}
+              className="absolute top-3 right-3 text-red-500 text-2xl z-10"
+            >
+              {isFavorite(car.id) ? <FaHeart /> : <FaRegHeart />}
+            </button>
           </div>
 
-          {/* Right: details */}
           <div className="p-6 flex flex-col">
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -111,7 +128,9 @@ function CarDetailPage() {
                 <p className="text-xs text-gray-500">Price per day</p>
                 <p className="text-3xl font-bold text-[#0e1f6c]">
                   ${car.pricePerDay}
-                  <span className="text-sm font-normal text-gray-500">/day</span>
+                  <span className="text-sm font-normal text-gray-500">
+                    /day
+                  </span>
                 </p>
               </div>
             </div>

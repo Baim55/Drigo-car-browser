@@ -8,6 +8,7 @@ export const initialFilters = {
   seats: "All",
   sort: "none",
   page: 1,
+  favoritesOnly: false,
 };
 
 function filtersReducer(state, action) {
@@ -38,6 +39,8 @@ function filtersReducer(state, action) {
       return { ...state, page: action.payload };
     case "RESET":
       return initialFilters;
+    case "SET_FAVORITES_ONLY":
+      return { ...state, favoritesOnly: action.payload, page: 1 };
     default:
       return state;
   }

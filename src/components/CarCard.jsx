@@ -1,17 +1,29 @@
-import { FaCar, FaRegUser } from "react-icons/fa";
+import { FaCar, FaHeart, FaRegHeart, FaRegUser } from "react-icons/fa";
 import { TbAutomaticGearbox, TbManualGearbox } from "react-icons/tb";
 import { Link } from "react-router-dom";
 
-function CarCard({ car }) {
+function CarCard({ car, isFavorite, onToggleFavorite }) {
   const badgeClass = car.available
     ? "bg-green-100 text-green-700"
     : "bg-red-100 text-red-700";
 
+  function handleFavoriteClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleFavorite(car.id);
+  }
+
   return (
     <Link to={`/cars/${car.id}`} className="block">
       <div className=" rounded-lg p-4 shadow-xl flex flex-col gap-2">
-        <div className="w-full h-32 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl mb-8">
+        <div className="relative w-full h-32 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl mb-8">
           <FaCar />
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-3 right-3 text-red-500 text-lg z-10"
+          >
+            {isFavorite ? <FaHeart /> : <FaRegHeart />}
+          </button>
         </div>
         <div className="flex justify-between items-start">
           <h3 className="text-lg font-semibold">{car.name}</h3>

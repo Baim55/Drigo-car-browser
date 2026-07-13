@@ -7,8 +7,9 @@ function FilterBar({
   onAvailableOnlyChange,
   seats,
   onSeatsChange,
+  favoritesOnly,
+  onFavoritesOnlyChange,
 }) {
-
   const ALL_TYPES = ["Economy", "Sedan", "SUV", "Luxury"];
 
   return (
@@ -28,16 +29,16 @@ function FilterBar({
 
       <div className="w-full">
         <p className="font-bold text-[20px]">Type</p>
-       {ALL_TYPES.map((t)=>(
-        <label key={t} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={types.includes(t)}
-            onChange={() => onTypeToggle(t)}
-          />
-          {t}
-        </label>
-       ))}
+        {ALL_TYPES.map((t) => (
+          <label key={t} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={types.includes(t)}
+              onChange={() => onTypeToggle(t)}
+            />
+            {t}
+          </label>
+        ))}
       </div>
       <div className="w-full">
         <p className="font-bold text-[20px]">Seats</p>
@@ -59,6 +60,14 @@ function FilterBar({
           onChange={(e) => onAvailableOnlyChange(e.target.checked)}
         />
         Available only
+      </label>
+      <label className="flex items-center gap-2 mb-2">
+        <input
+          type="checkbox"
+          checked={favoritesOnly}
+          onChange={(e) => onFavoritesOnlyChange(e.target.checked)}
+        />
+        Favorites only
       </label>
     </div>
   );

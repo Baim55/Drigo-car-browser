@@ -16,12 +16,15 @@ import filtersReducer, { initialFilters } from "../reducers/filtersReducer";
 import PriceRangeFilter from "../components/PriceRangeFilter";
 import paginate from "../utils/paginate";
 import Pagination from "../components/Pagination";
+import useFavorites from "../hooks/useFavorites";
 
 function CarListPage() {
   const PAGE_SIZE = 6;
 
   const { data: cars, loading, error, retry } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { isFavorite, toggleFavorite, favoriteIds } = useFavorites();
 
   const [filters, dispatch] = useReducer(
     filtersReducer,
@@ -56,6 +59,8 @@ function CarListPage() {
       priceMin: debouncedPriceMin,
       priceMax: debouncedPriceMax,
       seats: filters.seats,
+      favoritesOnly: filters.favoritesOnly,
+      favoriteIds,
     });
     return sortCars(filtered, filters.sort);
   }, [
@@ -68,6 +73,8 @@ function CarListPage() {
     debouncedPriceMax,
     filters.seats,
     filters.sort,
+    filters.favoritesOnly,
+    favoriteIds,
   ]);
 
   const { paginatedItems, totalPages, currentPage } = useMemo(() => {
@@ -134,6 +141,10 @@ function CarListPage() {
             onSeatsChange={(value) =>
               dispatch({ type: "SET_SEATS", payload: value })
             }
+            favoritesOnly={filters.favoritesOnly}
+            onFavoritesOnlyChange={(value) =>
+              dispatch({ type: "SET_FAVORITES_ONLY", payload: value })
+            }
           />
           <PriceRangeFilter
             priceMin={filters.priceMin}
@@ -158,7 +169,11 @@ function CarListPage() {
           {filteredCars.length === 0 ? (
             <EmptyState onReset={handleReset} />
           ) : (
-            <CarGrid cars={paginatedItems} />
+            <CarGrid
+              cars={paginatedItems}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
+            />
           )}
           <Pagination
             currentPage={currentPage}

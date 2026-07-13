@@ -1,4 +1,17 @@
-function filterCars(cars, { search, transmission, types, availableOnly,priceMin, priceMax, seats }) {
+function filterCars(
+  cars,
+  {
+    search,
+    transmission,
+    types,
+    availableOnly,
+    priceMin,
+    priceMax,
+    seats,
+    favoritesOnly,
+    favoriteIds,
+  },
+) {
   return cars.filter((car) => {
     if (search && !car.name.toLowerCase().includes(search.toLowerCase())) {
       return false;
@@ -12,13 +25,16 @@ function filterCars(cars, { search, transmission, types, availableOnly,priceMin,
     if (availableOnly && !car.available) {
       return false;
     }
-    if(priceMin !== "" && car.pricePerDay  < parseFloat(priceMin)) {
+    if (priceMin !== "" && car.pricePerDay < parseFloat(priceMin)) {
       return false;
     }
-    if(priceMax !== "" && car.pricePerDay  > parseFloat(priceMax)) {
+    if (priceMax !== "" && car.pricePerDay > parseFloat(priceMax)) {
       return false;
     }
-    if(seats !== "All" && car.seats !== Number(seats)) {
+    if (seats !== "All" && car.seats !== Number(seats)) {
+      return false;
+    }
+    if (favoritesOnly && !favoriteIds.includes(car.id)) {
       return false;
     }
     return true;

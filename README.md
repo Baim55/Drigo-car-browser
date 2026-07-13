@@ -14,16 +14,16 @@ Week 2 internship task — async data, detail routes, richer filters, pagination
 
 ## Setup
 
-\`\`\`bash
+```bash
 npm install
 npm run dev
-\`\`\`
+```
 
 ## Running tests
 
-\`\`\`bash
+```bash
 npm test
-\`\`\`
+```
 
 ## Stack
 - React (Vite)

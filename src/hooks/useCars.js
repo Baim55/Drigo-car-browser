@@ -1,31 +1,32 @@
 import { useCallback, useEffect, useState } from "react";
-import { getCars } from "../api/carsApi";
+import { getCars } from "../mockApi/carsApi";
 
-function useCars() {
+function useCars(query) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadCars = useCallback(() => {
+  const load = useCallback(() => {
     setLoading(true);
     setError(null);
 
-    getCars()
-      .then((cars) => {
-        setData(cars);
+    getCars(query)
+      .then((result) => {
+        setData(result);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(query)]);
 
   useEffect(() => {
-    loadCars();
-  }, [loadCars]);
+    load();
+  }, [load]);
 
-  return { data, loading, error, retry: loadCars };
+  return { data, loading, error, retry: load };
 }
 
 export default useCars;

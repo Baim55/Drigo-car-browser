@@ -1,5 +1,5 @@
 import seedBookings from "./seedBookings.json";
-import carsData from "./cars.json";
+import carsData from "../data/cars.json";
 
 const BOOKING_KEY = "bookings";
 

@@ -17,8 +17,8 @@ export async function getCars(query = {}) {
     priceMin: query.priceMin || "",
     priceMax: query.priceMax || "",
     seats: query.seats || "All",
-    favoritesOnly: false,
-    favoriteIds: [],
+    favoritesOnly: query.favoritesOnly || false,
+    favoriteIds: query.favoriteIds || [],
   });
 
   const sorted = sortCars(filtered, query.sort || "none");

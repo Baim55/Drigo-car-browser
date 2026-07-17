@@ -2,9 +2,7 @@ import { useEffect, useMemo, useReducer } from "react";
 import CarGrid from "../components/CarGrid";
 import SearchBar from "../components/SearchBar";
 import useDebounce from "../hooks/useDebounce";
-import filterCars from "../utils/filterCars";
 import FilterBar from "../components/FilterBar";
-import sortCars from "../utils/sortCars";
 import SortSelect from "../components/SortSelect";
 import ResultsCounter from "../components/ResultsCounter";
 import EmptyState from "../components/EmptyState";
@@ -14,16 +12,11 @@ import ErrorState from "../components/ErrorState";
 import useCars from "../hooks/useCars";
 import filtersReducer, { initialFilters } from "../reducers/filtersReducer";
 import PriceRangeFilter from "../components/PriceRangeFilter";
-import paginate from "../utils/paginate";
 import Pagination from "../components/Pagination";
 import useFavorites from "../hooks/useFavorites";
 
 function CarListPage() {
-  const PAGE_SIZE = 6;
-
-  const { data: cars, loading, error, retry } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
-
   const { isFavorite, toggleFavorite, favoriteIds } = useFavorites();
 
   const [filters, dispatch] = useReducer(
@@ -49,9 +42,8 @@ function CarListPage() {
   const debouncedPriceMin = useDebounce(filters.priceMin, 300);
   const debouncedPriceMax = useDebounce(filters.priceMax, 300);
 
-  const filteredCars = useMemo(() => {
-    if (!cars) return [];
-    const filtered = filterCars(cars, {
+  const query = useMemo(
+    () => ({
       search: debouncedSearch,
       transmission: filters.transmission,
       types: filters.types,
@@ -59,31 +51,35 @@ function CarListPage() {
       priceMin: debouncedPriceMin,
       priceMax: debouncedPriceMax,
       seats: filters.seats,
+      sort: filters.sort,
+      page: filters.page,
       favoritesOnly: filters.favoritesOnly,
       favoriteIds,
-    });
-    return sortCars(filtered, filters.sort);
-  }, [
-    cars,
-    debouncedSearch,
-    filters.transmission,
-    filters.types,
-    filters.availableOnly,
-    debouncedPriceMin,
-    debouncedPriceMax,
-    filters.seats,
-    filters.sort,
-    filters.favoritesOnly,
-    favoriteIds,
-  ]);
+    }),
+    [
+      debouncedSearch,
+      filters.transmission,
+      filters.types,
+      filters.availableOnly,
+      debouncedPriceMin,
+      debouncedPriceMax,
+      filters.seats,
+      filters.sort,
+      filters.page,
+      filters.favoritesOnly,
+      favoriteIds,
+    ],
+  );
 
-  const { paginatedItems, totalPages, currentPage } = useMemo(() => {
-    return paginate(filteredCars, filters.page, PAGE_SIZE);
-  }, [filteredCars, filters.page]);
+  const { data, loading, error, retry } = useCars(query);
 
   function handleReset() {
     dispatch({ type: "RESET" });
   }
+
+  // const { paginatedItems, totalPages, currentPage } = useMemo(() => {
+  //   return paginate(filteredCars, filters.page, PAGE_SIZE);
+  // }, [filteredCars, filters.page]);
 
   useEffect(() => {
     const params = {};
@@ -111,8 +107,11 @@ function CarListPage() {
     setSearchParams(params, { replace: true });
   }, [filters, setSearchParams]);
 
-  if (loading) return <LoadingState />;
+  if (loading && !data) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
+
+  const items = data?.items || [];
+  const total = data?.total || 0;
 
   return (
     <div className="mb-5">
@@ -165,19 +164,20 @@ function CarListPage() {
         </div>
         <div className=" px-3 md:px-0">
           {" "}
-          <ResultsCounter shown={filteredCars.length} total={cars.length} />
-          {filteredCars.length === 0 ? (
+          <ResultsCounter shown={items.length} total={total} />
+          {loading && <p className="text-sm text-gray-400 mb-2">Updating…</p>}
+          {items.length === 0 ? (
             <EmptyState onReset={handleReset} />
           ) : (
             <CarGrid
-              cars={paginatedItems}
+              cars={items}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
           )}
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={data?.currentPage || 1}
+            totalPages={data?.totalPages || 1}
             onPageChange={(page) =>
               dispatch({ type: "SET_PAGE", payload: page })
             }

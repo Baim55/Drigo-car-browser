@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import useCars from "../hooks/useCars";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import {
@@ -11,24 +10,23 @@ import {
 } from "react-icons/fa";
 import { TbAutomaticGearbox, TbManualGearbox } from "react-icons/tb";
 import useFavorites from "../hooks/useFavorites";
+import useCar from "../hooks/useCar";
 
 function CarDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: cars, loading, error, retry } = useCars();
+  const { car, loading, error, retry } = useCar(id);
   const { isFavorite, toggleFavorite } = useFavorites();
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={retry} />;
-
-  const car = cars.find((car) => car.id === Number(id));
 
   function handleFavoriteClick(e) {
     e.preventDefault();
     toggleFavorite(car.id);
   }
 
-  if (!car) {
+  if (error) {
     return (
       <div className="container flex flex-col items-center justify-center min-h-[400px] text-center">
         <FaCar size={40} className="text-gray-400 mb-3" />

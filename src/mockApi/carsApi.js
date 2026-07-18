@@ -3,10 +3,15 @@ import { simulateNetwork } from "./simulateNetwork";
 import filterCars from "../utils/filterCars";
 import sortCars from "../utils/sortCars";
 import paginate from "../utils/paginate";
+import { getCached, setCached } from "./cache";
 
 const PAGE_SIZE = 6;
 
-export async function getCars(query = {}) {
+function queryToKey(query) {
+  return `cars:${JSON.stringify(query)}`;
+}
+
+async function fetchCarsFromServer(query) {
   await simulateNetwork();
 
   const filtered = filterCars(db.cars, {
@@ -33,6 +38,22 @@ export async function getCars(query = {}) {
     totalPages,
     currentPage,
   };
+}
+
+export async function getCars(query = {}, { skipCache = false } = {}) {
+  const key = queryToKey(query);
+  const cached = getCached(key);
+
+  if (cached && !skipCache) {
+    fetchCarsFromServer(query)
+      .then((fresh) => setCached(key, fresh))
+      .catch(() => {});
+    return cached;
+  }
+
+  const result = await fetchCarsFromServer(query);
+  setCached(key, result);
+  return result;
 }
 
 export async function getCar(id) {

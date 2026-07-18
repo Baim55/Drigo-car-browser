@@ -1,3 +1,4 @@
+import { invalidateCache } from "./cache";
 import { db } from "./db";
 import { simulateNetwork } from "./simulateNetwork";
 
@@ -14,7 +15,7 @@ export async function createBooking(data) {
   await simulateNetwork();
 
   const bookings = db.getBookings();
-  
+
   const overlaps = bookings.some(
     (b) =>
       b.carId === data.carId &&
@@ -35,6 +36,7 @@ export async function createBooking(data) {
   };
   const updated = [...bookings, newBooking];
   db.saveBookings(updated);
+  invalidateCache((key) => key.startsWith("cars:"));
   return newBooking;
 }
 
@@ -49,5 +51,6 @@ export async function cancelBooking(id) {
   }
 
   db.saveBookings(updated);
+  invalidateCache((key) => key.startsWith("cars:"));
   return { success: true };
 }

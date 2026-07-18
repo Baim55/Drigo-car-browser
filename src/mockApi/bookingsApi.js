@@ -1,3 +1,4 @@
+import { hasOverlappingBooking } from "../utils/checkOverlap";
 import { invalidateCache } from "./cache";
 import { db } from "./db";
 import { simulateNetwork } from "./simulateNetwork";
@@ -16,14 +17,7 @@ export async function createBooking(data) {
 
   const bookings = db.getBookings();
 
-  const overlaps = bookings.some(
-    (b) =>
-      b.carId === data.carId &&
-      data.startDate < b.endDate &&
-      data.endDate > b.startDate,
-  );
-
-  if (overlaps) {
+  if (hasOverlappingBooking(bookings,data.carId,data.startDate,data.endDate)) {
     throw new Error("This car is already booked for the selected dates.");
   }
 

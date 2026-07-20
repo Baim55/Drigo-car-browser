@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import {
@@ -130,6 +130,12 @@ function CarDetailPage() {
                     /day
                   </span>
                 </p>
+              </div>
+              <div>
+                <Link
+                  to={`/cars/${car.id}/book`}
+                  className="bg-blue-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition"
+                >Book now</Link>
               </div>
             </div>
           </div>

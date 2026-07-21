@@ -5,20 +5,40 @@ import CarDetailPage from "./pages/CarDetailPage";
 import BookingWizard from "./pages/BookingWizard/BookingWizard";
 import { BookingProvider } from "./context/BookingsContext";
 import MyBookingsPage from "./pages/MyBookingsPage";
+import { AuthProvider } from "./context/AuthContext";
+import SignInPage from "./pages/SignInPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <BookingProvider>
-      <div className="mb-5">
-        <Header />
-        <Routes>
-          <Route path="/" element={<CarListPage />} />
-          <Route path="/cars/:id" element={<CarDetailPage />} />
-          <Route path="/cars/:id/book" element={<BookingWizard />} />
-          <Route path="/my-bookings" element={<MyBookingsPage />} />
-        </Routes>
-      </div>
-    </BookingProvider>
+    <AuthProvider>
+      <BookingProvider>
+        <div className="mb-5">
+          <Header />
+          <Routes>
+            <Route path="/" element={<CarListPage />} />
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/cars/:id" element={<CarDetailPage />} />
+            <Route
+              path="/cars/:id/book"
+              element={
+                <ProtectedRoute>
+                  <BookingWizard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-bookings"
+              element={
+                <ProtectedRoute>
+                  <MyBookingsPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </BookingProvider>
+    </AuthProvider>
   );
 }
 

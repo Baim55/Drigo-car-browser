@@ -6,16 +6,24 @@ import bookingWizardReducer, {
 } from "../../reducers/bookingWizardReducer";
 import LoadingState from "../../components/LoadingState";
 import ErrorState from "../../components/ErrorState";
-import { validateDatesStep, validateDriverStep } from "../../utils/validateBookingStep";
+import {
+  validateDatesStep,
+  validateDriverStep,
+} from "../../utils/validateBookingStep";
 import { createBooking } from "../../mockApi/bookingsApi";
 import StepDates from "./StepDates";
 import StepDriver from "./StepDriver";
 import StepReview from "./StepReview";
+import { useToast } from "../../context/ToastContext";
+import { useBookings } from "../../context/BookingsContext";
 
 function BookingWizard() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { car, loading, error } = useCar(id);
+
+  const { retry: refreshBookings } = useBookings();
 
   const [wizard, dispatch] = useReducer(
     bookingWizardReducer,
@@ -35,7 +43,7 @@ function BookingWizard() {
   function handleDatesNext() {
     const errors = validateDatesStep(wizard);
     setDateErrors(errors);
-    if (Object.keys(errors)) {
+    if (Object.keys(errors).length === 0) {
       dispatch({ type: "NEXT_STEP" });
     }
   }
@@ -68,9 +76,12 @@ function BookingWizard() {
         endDate: wizard.endDate,
         driver: wizard.driverName,
       });
+      refreshBookings()
+      showToast("Booking confirmed!", "success");
       navigate("/my-bookings");
     } catch (err) {
       setSubmitError(err.message);
+      showToast(err.message, "error");
       setSubmitting(false);
     }
   }

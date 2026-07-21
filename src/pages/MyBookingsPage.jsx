@@ -3,6 +3,7 @@ import { useBookings } from "../context/BookingsContext";
 import { getCar } from "../mockApi/carsApi";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
+import { useToast } from "../context/ToastContext";
 
 function todayString() {
   return new Date().toISOString().split("T")[0];
@@ -13,6 +14,7 @@ function MyBookingsPage() {
   const [carsById, setCarsById] = useState({});
   const [cancellingId, setCancellingId] = useState(null);
   const [cancelError, setCancelError] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     bookings.forEach((b) => {
@@ -41,8 +43,10 @@ function MyBookingsPage() {
 
     try {
       await cancelBooking(id);
+       showToast("Booking cancelled.", "success");
     } catch (err) {
       setCancelError(err.message);
+      showToast("Failed to cancel booking. Please try again.", "error");
     } finally {
       setCancellingId(null);
     }
@@ -57,7 +61,7 @@ function MyBookingsPage() {
       >
         <div>
           <p className="font-semibold">
-            {car ? car.name : `Car #${booking.carId}`}
+            {car ? car.name : "Loading..."}
           </p>
           <p className="text-sm text-gray-600">
             {booking.startDate} → {booking.endDate}

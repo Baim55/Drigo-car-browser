@@ -29,27 +29,27 @@ function DateRangePicker({
 
   return (
     <div className="w-full">
-      <div className="flex gap-4">
+      <div className="flex gap-2 items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1"></label>
+          <label className="block text-sm font-medium text-gray-500 mb-1"></label>
           Start date
           <input
             type="date"
             value={startDate}
             min={today}
             onChange={(e) => onStartDateChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1"></label>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-500 mb-1"></label>
           End date
           <input
             type="date"
             value={endDate}
             min={startDate || today}
             onChange={(e) => onEndDateChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
           />
         </div>
       </div>

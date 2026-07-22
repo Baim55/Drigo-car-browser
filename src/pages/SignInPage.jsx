@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import useFocusOnRouteChange from "../hooks/useFocusOnRouteChange";
 
 function SignInPage() {
   const { signIn } = useAuth();
@@ -10,6 +11,8 @@ function SignInPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+
+  const headingRef = useFocusOnRouteChange();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -28,7 +31,9 @@ function SignInPage() {
   return (
     <div className="container w-[450px]">
       <div className="bg-white border rounded-2xl shadow-xl p-6">
-        <h1 className="text-2xl font-bold mb-6">Sign in</h1>
+        <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-bold mb-6">
+          Sign in
+        </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>

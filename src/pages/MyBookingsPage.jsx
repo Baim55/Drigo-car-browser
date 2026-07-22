@@ -4,6 +4,7 @@ import { getCar } from "../mockApi/carsApi";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import { useToast } from "../context/ToastContext";
+import useFocusOnRouteChange from "../hooks/useFocusOnRouteChange";
 
 function todayString() {
   return new Date().toISOString().split("T")[0];
@@ -15,6 +16,8 @@ function MyBookingsPage() {
   const [cancellingId, setCancellingId] = useState(null);
   const [cancelError, setCancelError] = useState(null);
   const { showToast } = useToast();
+
+  const headingRef = useFocusOnRouteChange();
 
   useEffect(() => {
     bookings.forEach((b) => {
@@ -43,7 +46,7 @@ function MyBookingsPage() {
 
     try {
       await cancelBooking(id);
-       showToast("Booking cancelled.", "success");
+      showToast("Booking cancelled.", "success");
     } catch (err) {
       setCancelError(err.message);
       showToast("Failed to cancel booking. Please try again.", "error");
@@ -60,9 +63,7 @@ function MyBookingsPage() {
         className="bg-white border rounded-xl p-4 shadow flex justify-between items-center mb-3"
       >
         <div>
-          <p className="font-semibold">
-            {car ? car.name : "Loading..."}
-          </p>
+          <p className="font-semibold">{car ? car.name : "Loading..."}</p>
           <p className="text-sm text-gray-600">
             {booking.startDate} → {booking.endDate}
           </p>
@@ -80,7 +81,9 @@ function MyBookingsPage() {
 
   return (
     <div className="container px-3 md:px-0 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
+      <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-bold mb-6">
+        My Bookings
+      </h1>
 
       {cancelError && <p className="text-red-600 mb-4">{cancelError}</p>}
 

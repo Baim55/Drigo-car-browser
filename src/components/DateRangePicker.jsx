@@ -31,9 +31,13 @@ function DateRangePicker({
     <div className="w-full">
       <div className="flex gap-2 items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-500 mb-1"></label>
+          <label
+            htmlFor="start-date"
+            className="block text-sm font-medium text-gray-500 mb-1"
+          ></label>
           Start date
           <input
+            id="start-date"
             type="date"
             value={startDate}
             min={today}
@@ -42,9 +46,13 @@ function DateRangePicker({
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-500 mb-1"></label>
+          <label
+            htmlFor="end-date"
+            className="block text-sm font-medium text-gray-500 mb-1"
+          ></label>
           End date
           <input
+            id="end-date"
             type="date"
             value={endDate}
             min={startDate || today}

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useCar from "../../hooks/useCar";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import bookingWizardReducer, {
   initialWizardState,
 } from "../../reducers/bookingWizardReducer";
@@ -33,6 +33,14 @@ function BookingWizard() {
   const [driverErrors, setDriverErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  const stepHeadingRef = useRef(null);
+
+  useEffect(() => {
+    if (stepHeadingRef.current) {
+      stepHeadingRef.current.focus();
+    }
+  }, [wizard.step]);
 
   if (loading) return <LoadingState />;
   if (error)
@@ -76,7 +84,7 @@ function BookingWizard() {
         endDate: wizard.endDate,
         driver: wizard.driverName,
       });
-      refreshBookings()
+      refreshBookings();
       showToast("Booking confirmed!", "success");
       navigate("/my-bookings");
     } catch (err) {

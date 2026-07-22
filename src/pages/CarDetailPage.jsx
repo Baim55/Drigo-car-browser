@@ -11,8 +11,10 @@ import {
 import { TbAutomaticGearbox, TbManualGearbox } from "react-icons/tb";
 import useFavorites from "../hooks/useFavorites";
 import useCar from "../hooks/useCar";
+import useFocusOnRouteChange from "../hooks/useFocusOnRouteChange";
 
 function CarDetailPage() {
+  const headingRef = useFocusOnRouteChange();
   const { id } = useParams();
   const navigate = useNavigate();
   const { car, loading, error, retry } = useCar(id);
@@ -75,7 +77,13 @@ function CarDetailPage() {
           <div className="p-6 flex flex-col">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{car.name}</h1>
+                <h1
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="text-2xl font-bold text-gray-900"
+                >
+                  {car.name}
+                </h1>
                 <p className="text-gray-500 text-sm mt-1">{car.type}</p>
               </div>
               <span
@@ -135,7 +143,9 @@ function CarDetailPage() {
                 <Link
                   to={`/cars/${car.id}/book`}
                   className="bg-blue-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition"
-                >Book now</Link>
+                >
+                  Book now
+                </Link>
               </div>
             </div>
           </div>

@@ -9,39 +9,42 @@ import { AuthProvider } from "./context/AuthContext";
 import SignInPage from "./pages/SignInPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastProvider } from "./context/ToastContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
-    <AuthProvider>
-      <BookingProvider>
-        <ToastProvider>
-          <div className="mb-5">
-            <Header />
-            <Routes>
-              <Route path="/" element={<CarListPage />} />
-              <Route path="/signin" element={<SignInPage />} />
-              <Route path="/cars/:id" element={<CarDetailPage />} />
-              <Route
-                path="/cars/:id/book"
-                element={
-                  <ProtectedRoute>
-                    <BookingWizard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-bookings"
-                element={
-                  <ProtectedRoute>
-                    <MyBookingsPage />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </div>
-        </ToastProvider>
-      </BookingProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BookingProvider>
+          <ToastProvider>
+            <div className="mb-5">
+              <Header />
+              <Routes>
+                <Route path="/" element={<CarListPage />} />
+                <Route path="/signin" element={<SignInPage />} />
+                <Route path="/cars/:id" element={<CarDetailPage />} />
+                <Route
+                  path="/cars/:id/book"
+                  element={
+                    <ProtectedRoute>
+                      <BookingWizard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-bookings"
+                  element={
+                    <ProtectedRoute>
+                      <MyBookingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </div>
+          </ToastProvider>
+        </BookingProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
